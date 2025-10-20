@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:neura/core/themes/theme.dart';
-import 'package:neura/feature/message/presentation/message_screen.dart';
+import 'package:neura/feature/auth/presentation/ui/login_screen.dart';
+import 'package:neura/feature/auth/presentation/ui/register_screen.dart';
+import 'package:neura/feature/message/presentation/ui/chat_screen.dart';
+import 'package:neura/feature/message/presentation/ui/message_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,8 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Neura App',
       theme: AppTheme.darkTheme,
-      home: MessagesScreen()
+      home: LoginScreen(),
     );
   }
 }
-

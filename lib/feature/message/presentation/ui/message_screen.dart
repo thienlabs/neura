@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:neura/core/themes/theme.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -44,16 +45,25 @@ class _MessagesScreenState extends State<MessagesScreen> {
               ],
             ),
           ),
-          Expanded(child: Container(
-            child: ListView(
-              children: [
-                _buildMessageTile('Danny','dany@gmail.vn','08.03'),
-                 _buildMessageTile('Casu','casu@gmail.vn','08.21'),
-                  _buildMessageTile('Res','res@gmail.vn','08.21'),
-                    _buildMessageTile('Casu','casu@gmail.vn','08.21'),
-              ],
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: DefaultColors.sentMessageInput,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(50),
+                  topRight: Radius.circular(50),
+                ),
+              ),
+              child: ListView(
+                children: [
+                  _buildMessageTile('Danny', 'dany@gmail.vn', '08.03'),
+                  _buildMessageTile('Casu', 'casu@gmail.vn', '08.21'),
+                  _buildMessageTile('Res', 'res@gmail.vn', '08.21'),
+                  _buildMessageTile('Casu', 'casu@gmail.vn', '08.21'),
+                ],
+              ),
             ),
-          ))
+          ),
         ],
       ),
     );
@@ -75,22 +85,22 @@ Widget _buildRecentContact(String name, BuildContext context) {
   );
 }
 
-Widget _buildMessageTile(String name, String message,String time) {
+Widget _buildMessageTile(String name, String message, String time) {
   return ListTile(
     contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
     leading: CircleAvatar(
       radius: 30,
       backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3'),
     ),
-    title: Text(name, style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold)),
+    title: Text(
+      name,
+      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+    ),
     subtitle: Text(
       message,
       style: TextStyle(color: Colors.grey),
       overflow: TextOverflow.ellipsis,
     ),
-    trailing: Text(
-      time,
-      style:TextStyle(color: Colors.grey) ,
-    ),
+    trailing: Text(time, style: TextStyle(color: Colors.grey)),
   );
 }
