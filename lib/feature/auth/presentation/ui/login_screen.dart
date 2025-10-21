@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neura/core/themes/theme.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_event.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_state.dart';
+import 'package:neura/feature/auth/presentation/widgets/auth_button.dart';
+import 'package:neura/feature/auth/presentation/widgets/auth_input_field.dart';
+import 'package:neura/feature/auth/presentation/widgets/login_prompt.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,16 +19,20 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _showInputValues() {
-    String email = _emailController.text;
-    String password = _passwordController.text;
-  }
-
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _onLogin() {
+    BlocProvider.of<AuthBloc>(context).add(
+      LoginEvent(
+        email: _emailController.text,
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
@@ -35,18 +46,46 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildTextInput('Email', Icons.email, _emailController),
+              AuthInputField(
+                hintText: 'Email',
+                icon: Icons.email,
+                controller: _emailController,
+              ),
               SizedBox(height: 20),
-              _buildTextInput(
-                'Password',
-                Icons.password_outlined,
-                _passwordController,
+              AuthInputField(
+                hintText: 'Password',
+                icon: Icons.lock,
+                controller: _passwordController,
                 isPassword: true,
               ),
               SizedBox(height: 20),
-              _buildLoginButton(),
-              SizedBox(height: 20),
-              _buildLoginPrompt(),
+
+              BlocConsumer<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  return AuthButton(text: 'Login', onPressed: _onLogin);
+                },
+                listener: (context, state) {
+                  if (state is AuthSuccess) {
+                    SnackBar(content: Text("Login Successful"));
+                    Navigator.pushReplacementNamed(context, '/home');
+                  } else if (state is AuthFailure) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(state.error)));
+                  }
+                },
+              ),
+               SizedBox(height: 20),
+              LoginPrompt(
+                onTap: () {
+                  Navigator.pushReplacementNamed(context, '/register');
+                },
+                text: "Have an account?",
+                subtittle: "Click here to register",
+              ),
             ],
           ),
         ),
@@ -56,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginButton() {
     return ElevatedButton(
-      onPressed: _showInputValues,
+      onPressed: _onLogin,
       style: ElevatedButton.styleFrom(
         backgroundColor: DefaultColors.buttonColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),

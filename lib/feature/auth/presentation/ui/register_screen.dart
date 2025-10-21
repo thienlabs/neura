@@ -1,7 +1,14 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neura/core/themes/theme.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_event.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_state.dart';
+import 'package:neura/feature/auth/presentation/widgets/auth_button.dart';
+import 'package:neura/feature/auth/presentation/widgets/auth_input_field.dart';
+import 'package:neura/feature/auth/presentation/widgets/login_prompt.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,16 +22,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _showInputValues() {
-    String username = _usernameController.text;
-    String email = _emailController.text;
-    String password = _passwordController.text;
-    print('Username: $username, $email, $password');
+  
+
+  void _onRegister() {
+    BlocProvider.of<AuthBloc>(context).add(
+      RegisterEvent(
+        username: _usernameController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
   void dispose() {
-    
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -42,20 +53,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildTextInput('User name', Icons.person, _usernameController),
+              AuthInputField(
+                hintText: 'User name',
+                icon: Icons.person,
+                controller: _usernameController,
+              ),
               SizedBox(height: 20),
-              _buildTextInput('Email', Icons.email, _emailController),
+              AuthInputField(
+                hintText: 'Email',
+                icon: Icons.email,
+                controller: _emailController,
+              ),
               SizedBox(height: 20),
-              _buildTextInput(
-                'Password',
-                Icons.password_outlined,
-                _passwordController,
+              AuthInputField(
+                hintText: 'Password',
+                icon: Icons.lock,
+                controller: _passwordController,
                 isPassword: true,
               ),
               SizedBox(height: 20),
-              _buildRegisterButton(),
+              BlocConsumer<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  return AuthButton(text: 'Register', onPressed: _onRegister);
+                },
+                listener: (context, state) {
+                  if (state is AuthSuccess) {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  } else if (state is AuthFailure) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(state.error)));
+                  }
+                },
+              ),
+            
               SizedBox(height: 20),
-              _buildLoginPrompt(),
+              LoginPrompt(
+                onTap:(){
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                text: "Don't have an account?",
+                subtittle: "Click here to login",
+              ),
             ],
           ),
         ),
@@ -65,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildRegisterButton() {
     return ElevatedButton(
-      onPressed: _showInputValues,
+      onPressed: _onRegister,
       style: ElevatedButton.styleFrom(
         backgroundColor: DefaultColors.buttonColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
