@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neura/core/services/socket_service.dart';
 import 'package:neura/core/themes/theme.dart';
 import 'package:neura/feature/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:neura/feature/auth/data/repositories/auth_repository_impl.dart';
@@ -8,21 +9,48 @@ import 'package:neura/feature/auth/domain/usecases/register_use_case.dart';
 import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
 import 'package:neura/feature/auth/presentation/ui/login_screen.dart';
 import 'package:neura/feature/auth/presentation/ui/register_screen.dart';
-import 'package:neura/feature/message/presentation/ui/chat_screen.dart';
-import 'package:neura/feature/message/presentation/ui/message_screen.dart';
+import 'package:neura/feature/chat/data/datasources/message_remote_data_source.dart';
+import 'package:neura/feature/chat/data/repositories/message_repository_impl.dart';
+import 'package:neura/feature/chat/domain/usecases/fetch_message_use_case.dart';
+import 'package:neura/feature/chat/presentation/bloc/chat_bloc.dart';
+import 'package:neura/feature/conversation/data/datasources/conversation_remote_data_source.dart';
+import 'package:neura/feature/conversation/data/repositories/conversation_repository_impl.dart';
+import 'package:neura/feature/conversation/domain/usecases/fetch_conversation_use_case.dart';
+import 'package:neura/feature/conversation/presentation/bloc/conversation_bloc.dart';
+import 'package:neura/feature/conversation/presentation/ui/conversation_screen.dart';
 
-void main() {
+void main(){
+
   final authRepository = AuthRepositoryImpl(
     authRemoteDataSource: AuthRemoteDataSource(),
   );
+  final conversationRepository = ConversationRepositoryImpl(
+    converSationRemoteDataDource: ConversationRemoteDataSource(),
+  );
+  final messageRepository = MessageRepositoryImpl(
+    messageRemoteDataSource: MessageRemoteDataSource(),
+  );
 
-  runApp(MyApp(authRepository: authRepository));
+  
+  runApp(
+    MyApp(
+      authRepository: authRepository,
+      conversationRepository: conversationRepository,
+      messageRepository: messageRepository,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepositoryImpl authRepository;
-
-  const MyApp({super.key, required this.authRepository});
+  final ConversationRepositoryImpl conversationRepository;
+  final MessageRepositoryImpl messageRepository;
+  const MyApp({
+    super.key,
+    required this.authRepository,
+    required this.conversationRepository,
+    required this.messageRepository,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +62,30 @@ class MyApp extends StatelessWidget {
             LoginUseCase(repository: authRepository),
           ),
         ),
+        BlocProvider(
+          create: (_) => ConversationBloc(
+            fetchConversationsUseCase: FetchConversationsUseCase(
+              repository: conversationRepository,
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => ChatBloc(
+            fetchMessageUseCase: FetchMessageUseCase(
+              repository: messageRepository,
+            ),
+          ),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Neura App',
         theme: AppTheme.darkTheme,
-        home: const RegisterScreen(),
+        home: LoginScreen(),
         routes: {
           '/login': (_) => const LoginScreen(),
           '/register': (_) => const RegisterScreen(),
-          '/chat': (_) => const ChatScreen(),
-          '/home': (_) => const MessageScreen(),
+          '/home': (_) => const ConversationScreen(),
         },
       ),
     );

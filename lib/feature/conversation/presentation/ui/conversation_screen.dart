@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neura/core/themes/theme.dart';
+import 'package:neura/feature/chat/presentation/screens/chat_screen.dart';
+import 'package:neura/feature/conversation/presentation/bloc/conversation_bloc.dart';
+import 'package:neura/feature/conversation/presentation/bloc/conversation_event.dart';
+import 'package:neura/feature/conversation/presentation/bloc/conversation_state.dart';
 
-class MessageScreen extends StatefulWidget {
-  const MessageScreen({super.key});
+class ConversationScreen extends StatefulWidget {
+  const ConversationScreen({super.key});
 
   @override
-  State<MessageScreen> createState() => _MessageScreenState();
+  State<ConversationScreen> createState() => _ConversationScreenState();
 }
 
-class _MessageScreenState extends State<MessageScreen> {
+class _ConversationScreenState extends State<ConversationScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    BlocProvider.of<ConversationBloc>(context).add(FetchConversationsEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,14 +66,45 @@ class _MessageScreenState extends State<MessageScreen> {
                   topRight: Radius.circular(50),
                 ),
               ),
-              child: ListView(
-                children: [
-                  _buildMessageTile('Danny', 'dany@gmail.vn', '08.03'),
-                  _buildMessageTile('Casu', 'casu@gmail.vn', '08.21'),
-                  _buildMessageTile('Res', 'res@gmail.vn', '08.21'),
-                  _buildMessageTile('Casu', 'casu@gmail.vn', '08.21'),
-                ],
-              ),
+              child:BlocBuilder<ConversationBloc, ConversationState>(
+  builder: (context, state) {
+    if (state is ConversationLoading) {
+      return Center(child: CircularProgressIndicator());
+    } else if (state is ConversationLoaded) {
+      return ListView.builder(
+        itemCount: state.conversations.length,
+        itemBuilder: (context, index) {
+          final conversation = state.conversations[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(
+                    conversationId: conversation.id,
+                    mate: conversation.participantName,
+                  ),
+                ),
+              );
+              
+            },
+            child: _buildMessageTile(
+              conversation.participantName,
+              conversation.lastMessage,
+              conversation.lastMessageTime.toString(),
+            ),
+            
+          );
+        },
+      );
+      
+    } else if (state is ConversationError) {
+      return Center(child: Text('Error: ${state.message}'));
+    }
+    return Center(child: Text('No conversations found.'));
+  },
+),
+
             ),
           ),
         ],
@@ -94,12 +137,15 @@ Widget _buildMessageTile(String name, String message, String time) {
     ),
     title: Text(
       name,
+        maxLines: 1,
+          overflow: TextOverflow.ellipsis,
       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
     ),
     subtitle: Text(
       message,
       style: TextStyle(color: Colors.grey),
       overflow: TextOverflow.ellipsis,
+     
     ),
     trailing: Text(time, style: TextStyle(color: Colors.grey)),
   );

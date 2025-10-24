@@ -1,19 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:neura/core/themes/theme.dart';
+import 'package:neura/feature/chat/presentation/bloc/chat_bloc.dart';
+import 'package:neura/feature/chat/presentation/bloc/chat_event.dart';
+import 'package:neura/feature/chat/presentation/bloc/chat_state.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final String conversationId;
+  final String mate;
+  const ChatScreen({
+    super.key,
+    required this.conversationId,
+    required this.mate,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _messageController = TextEditingController();
+  final _storage = FlutterSecureStorage();
+  String userId = '';
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<ChatBloc>(
+      context,
+    ).add(LoadMessagesEvent(widget.conversationId));
+
+    fetchUserId();
+  }
+
+  void fetchUserId() async {
+    userId = await _storage.read(key: 'userId') ?? '';
+    setState(() {
+      userId = userId;
+    });
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  void _sendMessage() {
+    final content = _messageController.text.trim();
+    if (content.isNotEmpty) {
+      BlocProvider.of<ChatBloc>(
+        context,
+      ).add(SendMessageEvent(widget.conversationId, content));
+      _messageController.clear();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         backgroundColor: Colors.transparent,
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
         title: Row(
@@ -22,22 +70,36 @@ class _ChatScreenState extends State<ChatScreen> {
               backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3'),
             ),
             SizedBox(width: 10),
-            Text('Danny Hokin', style: Theme.of(context).textTheme.titleMedium),
+            Text(widget.mate, style: Theme.of(context).textTheme.titleMedium),
           ],
         ),
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.all(20),
-              children: [
-                _buildReceivedMessage(context, 'Hey, are we still.  '),
-                _buildSendMessage(
-                  context,
-                  'Sounds amazing! But I’m currently.',
-                ),
-              ],
+            child: BlocBuilder<ChatBloc, ChatState>(
+              builder: (context, state) {
+                if (state is ChatLoadingState) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (state is ChatLoadedState) {
+                  return ListView.builder(
+                    padding: EdgeInsets.all(20),
+                    itemCount: state.messages.length,
+                    itemBuilder: (context, index) {
+                      final message = state.messages[index];
+                      final isSentMessage = message.senderId.toString() == userId;
+                      if (isSentMessage) {
+                        return _buildSendMessage(context, message.content);
+                      } else {
+                        return _buildReceivedMessage(context, message.content);
+                      }
+                    },
+                  );
+                } else if (state is ChatErrorState) {
+                  return Center(child: Text(state.message));
+                }
+                return Center(child: Text('No message fount'));
+              },
             ),
           ),
           _buildMessageInput(),
@@ -92,7 +154,9 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           SizedBox(width: 10),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+
+            },
             child: SvgPicture.asset(
               'assets/svg/ic_micro.svg',
               color: Colors.grey,
@@ -101,6 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
           SizedBox(width: 10),
           Expanded(
             child: TextField(
+              controller: _messageController,
               maxLines: null,
               decoration: InputDecoration(
                 hintText: 'Aa',
@@ -120,6 +185,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           SizedBox(width: 5),
           GestureDetector(
+            onTap:_sendMessage,
             child: SvgPicture.asset(
               'assets/svg/ic_send.svg',
               color: Colors.grey,
