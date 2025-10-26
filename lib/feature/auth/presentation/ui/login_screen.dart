@@ -1,6 +1,9 @@
+import 'package:another_flushbar/flushbar.dart';
+import 'package:another_flushbar/flushbar_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neura/core/themes/theme.dart';
+import 'package:neura/core/utils/show_flushbar.dart';
 import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
 import 'package:neura/feature/auth/presentation/bloc/auth_event.dart';
 import 'package:neura/feature/auth/presentation/bloc/auth_state.dart';
@@ -69,8 +72,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 listener: (context, state) {
                   if (state is AuthSuccess) {
-                    SnackBar(content: Text("Login Successful"));
                     Navigator.pushReplacementNamed(context, '/home');
+                    showFlushbarStyle(
+                      context,
+                      title: 'Login',
+                      message: 'Successfully!',
+                      backgroundColor: DefaultColors.buttonColor,
+                      duration: const Duration(seconds: 2),
+                    );
                   } else if (state is AuthFailure) {
                     ScaffoldMessenger.of(
                       context,
@@ -78,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 },
               ),
-               SizedBox(height: 20),
+              SizedBox(height: 20),
               LoginPrompt(
                 onTap: () {
                   Navigator.pushReplacementNamed(context, '/register');

@@ -11,4 +11,11 @@ class ConversationRepositoryImpl implements ConversationRepository {
   Future<List<Conversation>> fetchConversations() async {
     return await converSationRemoteDataDource.fetchConversations();
   }
+
+  @override
+  Future<String> checkOrCreateConversation({required String contactId}) async {
+    return await converSationRemoteDataDource.checkOrCreateConvertion(
+      contactId: contactId,
+    );
+  }
 }

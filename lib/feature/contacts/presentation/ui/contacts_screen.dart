@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neura/feature/chat/presentation/screens/chat_screen.dart';
 import 'package:neura/feature/contacts/presentation/bloc/contact_bloc.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ContactBloc>().add(FetchContacts());
+    context.read<ContactBloc>().add(FetchContactsEvent());
   }
 
   @override
@@ -21,35 +22,57 @@ class _ContactsScreenState extends State<ContactsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Contacts')),
 
-      body: BlocBuilder<ContactBloc, ContactState>(
-        builder: (context, state) {
-          if (state is ContactsLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is ContactsLoaded) {
-            final contacts = state.contacts;
-            if (contacts.isEmpty) {
-              return const Center(child: Text('No contacts found'));
-            }
-            return ListView.builder(
-              itemCount: contacts.length,
-              itemBuilder: (context, index) {
-                final contact = contacts[index];
-                return ListTile(
-                  leading: const CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      'https://i.pravatar.cc/150',
-                    ),
-                  ),
-                  title: Text(contact.userName),
-                  subtitle: Text(contact.email),
-                );
-              },
+      body: BlocListener<ContactBloc, ContactState>(
+        listener: (context, state) {
+          if (state is ConversationReady) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(
+                  conversationId: state.conversationId,
+                  mate: state.contactName,
+                ),
+              ),
             );
-          } else if (state is ContactsError) {
-            return Center(child: Text(state.message));
           }
-          return const SizedBox();
         },
+        child: BlocBuilder<ContactBloc, ContactState>(
+          builder: (context, state) {
+            if (state is ContactsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ContactsLoaded) {
+              final contacts = state.contacts;
+              if (contacts.isEmpty) {
+                return const Center(child: Text('No contacts found'));
+              }
+              return ListView.builder(
+                itemCount: contacts.length,
+                itemBuilder: (context, index) {
+                  final contact = contacts[index];
+                  return ListTile(
+                    leading: const CircleAvatar(
+                      backgroundImage: NetworkImage('https://i.pravatar.cc/150'),
+                    ),
+                    title: Text(contact.userName),
+                    subtitle: Text(contact.email),
+                    onTap: () {
+                      context.read<ContactBloc>().add(
+                            CheckOrCreateConversationEvent(
+                              contactId: contact.id,
+                              contactName: contact.userName,
+                            ),
+                          );
+                    },
+                  );
+                },
+              );
+            } else if (state is ContactsError) {
+              return Center(child: Text(state.message));
+            }
+
+            return const SizedBox();
+          },
+        ),
       ),
 
       floatingActionButton: FloatingActionButton.extended(
@@ -68,8 +91,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
         title: const Text('Add Contact'),
         content: TextField(
           controller: emailController,
-         keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.done, 
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.done,
           decoration: const InputDecoration(hintText: 'Enter contact email'),
         ),
         actions: [
@@ -81,7 +104,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             onPressed: () {
               final email = emailController.text.trim();
               if (email.isNotEmpty) {
-                context.read<ContactBloc>().add(AddContact(email: email));
+                context.read<ContactBloc>().add(AddContactEvent(email: email));
                 Navigator.pop(context);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
