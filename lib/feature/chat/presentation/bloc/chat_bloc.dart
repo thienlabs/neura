@@ -17,7 +17,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendMessageEvent>(_onSendMessage);
     on<ReceiveMessageEvent>(_onReceiveMessage);
 
-    
     _socketService.socket.on('receive_message', (data) {
       print('📥 Tin nhắn mới nhận được: $data');
       add(ReceiveMessageEvent(data));
@@ -37,11 +36,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ..addAll(messageList);
       emit(ChatLoadedState(List.from(_messages)));
 
+    
       // ✅ Tham gia đúng phòng
       _socketService.joinRoom(event.conversationId);
+      
     } catch (e, stack) {
       print('❌ Lỗi load message: $e\n$stack');
       emit(ChatErrorState('Không thể tải tin nhắn'));
+      
     }
   }
 
@@ -65,13 +67,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _socketService.socket.emit('send_message', newMessage);
   }
 
-  void _onReceiveMessage(
-    ReceiveMessageEvent event,
-    Emitter<ChatState> emit,
-  ) {
+  void _onReceiveMessage(ReceiveMessageEvent event, Emitter<ChatState> emit) {
     final data = event.messageData;
 
-    // ⚡ Fix chỗ lỗi: sender_id là object -> lấy _id
+  
     final sender = data['sender_id'];
     final senderId = sender is Map ? sender['_id'] : sender;
 

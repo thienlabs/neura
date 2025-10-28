@@ -2,6 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:another_flushbar/flushbar_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:neura/core/themes/theme.dart';
 import 'package:neura/core/utils/show_flushbar.dart';
 import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
@@ -66,7 +67,10 @@ class _LoginScreenState extends State<LoginScreen> {
               BlocConsumer<AuthBloc, AuthState>(
                 builder: (context, state) {
                   if (state is AuthLoading) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(child:  LoadingAnimationWidget.threeRotatingDots(
+                  color: DefaultColors.senderMessage,
+                  size: 40,
+                ),);
                   }
                   return AuthButton(text: 'Login', onPressed: _onLogin);
                 },

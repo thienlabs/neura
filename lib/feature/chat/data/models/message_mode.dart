@@ -14,7 +14,7 @@ class MessageModel extends Message {
     return MessageModel(
       id: json['_id'] ?? '',
       conversationId: json['conversation_id'] ?? '',
-      senderId: json['sender_id']?['_id'] ?? '', // ✅ Lấy _id từ object
+      senderId: json['sender_id']?['_id'] ?? '',
       content: json['content'] ?? '',
      
       createdAt: json['created_at'],

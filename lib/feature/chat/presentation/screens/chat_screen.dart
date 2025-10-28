@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:neura/core/themes/theme.dart';
 import 'package:neura/feature/chat/presentation/bloc/chat_bloc.dart';
 import 'package:neura/feature/chat/presentation/bloc/chat_event.dart';
@@ -10,10 +11,12 @@ import 'package:neura/feature/chat/presentation/bloc/chat_state.dart';
 class ChatScreen extends StatefulWidget {
   final String conversationId;
   final String mate;
+  final String image;
   const ChatScreen({
     super.key,
     required this.conversationId,
     required this.mate,
+    required this.image
   });
 
   @override
@@ -67,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3'),
+              backgroundImage: NetworkImage(widget.image),
             ),
             SizedBox(width: 10),
             Text(widget.mate, style: Theme.of(context).textTheme.titleMedium),
@@ -80,14 +83,20 @@ class _ChatScreenState extends State<ChatScreen> {
             child: BlocBuilder<ChatBloc, ChatState>(
               builder: (context, state) {
                 if (state is ChatLoadingState) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: LoadingAnimationWidget.progressiveDots(
+                      color: DefaultColors.senderMessage,
+                      size: 40,
+                    ),
+                  );
                 } else if (state is ChatLoadedState) {
                   return ListView.builder(
                     padding: EdgeInsets.all(20),
                     itemCount: state.messages.length,
                     itemBuilder: (context, index) {
                       final message = state.messages[index];
-                      final isSentMessage = message.senderId.toString() == userId;
+                      final isSentMessage =
+                          message.senderId.toString() == userId;
                       if (isSentMessage) {
                         return _buildSendMessage(context, message.content);
                       } else {
@@ -154,9 +163,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           SizedBox(width: 10),
           GestureDetector(
-            onTap: () {
-
-            },
+            onTap: () {},
             child: SvgPicture.asset(
               'assets/svg/ic_micro.svg',
               color: Colors.grey,
@@ -185,7 +192,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           SizedBox(width: 5),
           GestureDetector(
-            onTap:_sendMessage,
+            onTap: _sendMessage,
             child: SvgPicture.asset(
               'assets/svg/ic_send.svg',
               color: Colors.grey,

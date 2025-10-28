@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neura/core/themes/theme.dart';
+import 'package:neura/core/utils/date_formatter.dart';
 import 'package:neura/feature/chat/presentation/screens/chat_screen.dart';
 import 'package:neura/feature/contacts/presentation/ui/contacts_screen.dart';
 import 'package:neura/feature/conversation/presentation/bloc/conversation_bloc.dart';
@@ -49,13 +50,43 @@ class _ConversationScreenState extends State<ConversationScreen> {
           Container(
             height: 100,
             padding: EdgeInsets.all(5),
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _buildRecentContact('Ji Seon', context),
-                _buildRecentContact('Cherry', context),
-                _buildRecentContact('Apple', context),
-              ],
+            child: BlocBuilder<ConversationBloc, ConversationState>(
+              builder: (context, state) {
+                if(state is ConversationLoading)
+                {
+                  return Center(child: CircularProgressIndicator());
+                }else if (state is ConversationLoaded) {
+                    return ListView.builder(
+                      itemCount: state.conversations.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        final conversation = state.conversations[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatScreen(
+                                  conversationId: conversation.id,
+                                  mate: conversation.participantName,
+                                   image: conversation.participantImage,
+                                ),
+                              ),
+                            );
+                          },
+                          child: _buildRecentContact(
+                            conversation.participantName,
+                            conversation.participantImage   
+                          ),
+                        );
+                      },
+                    );
+                  }
+               else if (state is ConversationError) {
+                    return Center(child: Text('Error: ${state.message}'));
+                  }
+                  return Center(child: Text('No conversations found.'));
+              },
             ),
           ),
           Expanded(
@@ -84,14 +115,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                 builder: (context) => ChatScreen(
                                   conversationId: conversation.id,
                                   mate: conversation.participantName,
+                                  image: conversation.participantImage,
                                 ),
                               ),
                             );
                           },
                           child: _buildMessageTile(
                             conversation.participantName,
+                            conversation.participantImage,
                             conversation.lastMessage,
-                            conversation.lastMessageTime.toString(),
+                           DateFormatter.formatLastMessageTime(conversation.lastMessageTime)
                           ),
                         );
                       },
@@ -120,28 +153,27 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 }
 
-Widget _buildRecentContact(String name, BuildContext context) {
+Widget _buildRecentContact(String name, String image) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 10),
     child: Column(
       children: [
-        CircleAvatar(
-          radius: 30,
-          backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3'),
-        ),
-        Text(name, style: Theme.of(context).textTheme.bodyMedium),
+        CircleAvatar(radius: 30, backgroundImage: NetworkImage(image)),
+        Text(name, style:TextStyle(color: Colors.white, fontWeight: FontWeight.bold) ),
       ],
     ),
   );
 }
 
-Widget _buildMessageTile(String name, String message, String time) {
+Widget _buildMessageTile(
+  String name,
+  String image,
+  String message,
+  String time,
+) {
   return ListTile(
     contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-    leading: CircleAvatar(
-      radius: 30,
-      backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=3'),
-    ),
+    leading: CircleAvatar(radius: 30, backgroundImage: NetworkImage(image)),
     title: Text(
       name,
       maxLines: 1,

@@ -59,11 +59,12 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     Emitter<ContactState> emit,
   ) async {
     try {
-      emit(ContactsLoading());
+    //  emit(ContactsLoading());
       final conversationId= await checkOrCreateConversationUseCase(
         contactId: event.contactId,
+        
       );
-      emit(ConversationReady(conversationId: conversationId, contactName: event.contactName));
+      emit(ConversationReady(conversationId: conversationId, contactName: event.contactName,image: event.contactImage,));
     } catch (e) {
       emit(ContactsError(e.toString()));
     }

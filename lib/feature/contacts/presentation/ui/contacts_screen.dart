@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:neura/core/themes/theme.dart';
 import 'package:neura/feature/chat/presentation/screens/chat_screen.dart';
 import 'package:neura/feature/contacts/presentation/bloc/contact_bloc.dart';
 
@@ -23,23 +25,33 @@ class _ContactsScreenState extends State<ContactsScreen> {
       appBar: AppBar(title: const Text('Contacts')),
 
       body: BlocListener<ContactBloc, ContactState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is ConversationReady) {
-            Navigator.push(
+            Navigator.pop(context);
+            final res = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ChatScreen(
                   conversationId: state.conversationId,
                   mate: state.contactName,
+                  image: state.image,
                 ),
               ),
             );
+            if (res == null) {
+              context.read<ContactBloc>().add(FetchContactsEvent());
+            }
           }
         },
         child: BlocBuilder<ContactBloc, ContactState>(
           builder: (context, state) {
             if (state is ContactsLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(
+                child: LoadingAnimationWidget.fourRotatingDots(
+                  color: DefaultColors.senderMessage,
+                  size: 40,
+                ),
+              );
             } else if (state is ContactsLoaded) {
               final contacts = state.contacts;
               if (contacts.isEmpty) {
@@ -50,18 +62,31 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 itemBuilder: (context, index) {
                   final contact = contacts[index];
                   return ListTile(
-                    leading: const CircleAvatar(
-                      backgroundImage: NetworkImage('https://i.pravatar.cc/150'),
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(
+                       contact.image
+                      ),
                     ),
                     title: Text(contact.userName),
                     subtitle: Text(contact.email),
                     onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => Center(
+                          child: LoadingAnimationWidget.staggeredDotsWave(
+                            color: DefaultColors.senderMessage,
+                            size: 60,
+                          ),
+                        ),
+                      );
                       context.read<ContactBloc>().add(
-                            CheckOrCreateConversationEvent(
-                              contactId: contact.id,
-                              contactName: contact.userName,
-                            ),
-                          );
+                        CheckOrCreateConversationEvent(
+                          contactId: contact.id,
+                          contactName: contact.userName,
+                          contactImage: contact.image
+                        ),
+                      );
                     },
                   );
                 },
@@ -75,10 +100,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
         ),
       ),
 
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddContactDialog(context),
-        icon: const Icon(Icons.person_add),
-        label: const Text('Add'),
+        child: const Icon(Icons.person_add),
+        backgroundColor: DefaultColors.buttonColor,
+        
       ),
     );
   }

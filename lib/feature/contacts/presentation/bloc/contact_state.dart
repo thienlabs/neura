@@ -23,9 +23,10 @@ class ContactAdded extends ContactState {}
 class ConversationReady extends ContactState {
   final String conversationId;
   final String contactName;
-
-  ConversationReady({required this.conversationId, required this.contactName});
-
-  
-
+  final String image;
+  ConversationReady({
+    required this.conversationId,
+    required this.contactName,
+    required this.image,
+  });
 }
