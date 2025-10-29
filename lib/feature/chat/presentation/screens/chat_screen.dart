@@ -16,7 +16,7 @@ class ChatScreen extends StatefulWidget {
     super.key,
     required this.conversationId,
     required this.mate,
-    required this.image
+    required this.image,
   });
 
   @override
@@ -27,6 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final _storage = FlutterSecureStorage();
   String userId = '';
+  final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
@@ -47,6 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -69,9 +71,7 @@ class _ChatScreenState extends State<ChatScreen> {
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
         title: Row(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(widget.image),
-            ),
+            CircleAvatar(backgroundImage: NetworkImage(widget.image)),
             SizedBox(width: 10),
             Text(widget.mate, style: Theme.of(context).textTheme.titleMedium),
           ],
@@ -85,7 +85,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (state is ChatLoadingState) {
                   return Center(
                     child: LoadingAnimationWidget.progressiveDots(
-                      color: DefaultColors.senderMessage,
+                      color: AppColors.senderMessage,
                       size: 40,
                     ),
                   );
@@ -93,6 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   return ListView.builder(
                     padding: EdgeInsets.all(20),
                     itemCount: state.messages.length,
+                    controller: _scrollController,
                     itemBuilder: (context, index) {
                       final message = state.messages[index];
                       final isSentMessage =
@@ -124,7 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
         margin: EdgeInsets.only(top: 5, bottom: 5),
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: DefaultColors.receiverMessage,
+          color: AppColors.receiverMessage,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Text(message, style: Theme.of(context).textTheme.bodyMedium),
@@ -139,7 +140,7 @@ class _ChatScreenState extends State<ChatScreen> {
         margin: EdgeInsets.only(top: 5, bottom: 5),
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: DefaultColors.senderMessage,
+          color: AppColors.senderMessage,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Text(message, style: Theme.of(context).textTheme.bodyMedium),
@@ -182,7 +183,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   vertical: 12,
                 ),
                 filled: true,
-                fillColor: DefaultColors.sentMessageInput,
+                fillColor: AppColors.sentMessageInput,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,

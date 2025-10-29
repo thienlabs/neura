@@ -28,6 +28,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Messages', style: Theme.of(context).textTheme.titleLarge),
+        leading: Builder(
+          builder: (context) => IconButton(
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            icon: Icon(Icons.menu),
+          ),
+        ),
         centerTitle: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -38,6 +46,39 @@ class _ConversationScreenState extends State<ConversationScreen> {
             icon: Icon(Icons.search, color: Colors.white),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: Container(
+          color: AppColors.primaryBackground,
+          padding: EdgeInsets.symmetric(vertical: 40),
+          child: Column(
+            children: [
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text('PROFILE'),
+                onTap: () {},
+              ),
+               ListTile(
+                leading: Icon(Icons.notifications),
+                title: Text('NOTIFICATIONS'),
+                onTap: () {},
+              ),
+              ListTile(
+                leading: Icon(Icons.settings),
+                title: Text('SETTINGS'),
+                onTap: () {},
+              ),
+              
+              Spacer(),
+              Divider(),
+              ListTile(
+                leading: Icon(Icons.logout),
+                title: Text('LOGOUT'),
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,47 +93,45 @@ class _ConversationScreenState extends State<ConversationScreen> {
             padding: EdgeInsets.all(5),
             child: BlocBuilder<ConversationBloc, ConversationState>(
               builder: (context, state) {
-                if(state is ConversationLoading)
-                {
+                if (state is ConversationLoading) {
                   return Center(child: CircularProgressIndicator());
-                }else if (state is ConversationLoaded) {
-                    return ListView.builder(
-                      itemCount: state.conversations.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        final conversation = state.conversations[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatScreen(
-                                  conversationId: conversation.id,
-                                  mate: conversation.participantName,
-                                   image: conversation.participantImage,
-                                ),
+                } else if (state is ConversationLoaded) {
+                  return ListView.builder(
+                    itemCount: state.conversations.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      final conversation = state.conversations[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                conversationId: conversation.id,
+                                mate: conversation.participantName,
+                                image: conversation.participantImage,
                               ),
-                            );
-                          },
-                          child: _buildRecentContact(
-                            conversation.participantName,
-                            conversation.participantImage   
-                          ),
-                        );
-                      },
-                    );
-                  }
-               else if (state is ConversationError) {
-                    return Center(child: Text('Error: ${state.message}'));
-                  }
-                  return Center(child: Text('No conversations found.'));
+                            ),
+                          );
+                        },
+                        child: _buildRecentContact(
+                          conversation.participantName,
+                          conversation.participantImage,
+                        ),
+                      );
+                    },
+                  );
+                } else if (state is ConversationError) {
+                  return Center(child: Text('Error: ${state.message}'));
+                }
+                return Center(child: Text('No conversations found.'));
               },
             ),
           ),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: DefaultColors.sentMessageInput,
+                color: AppColors.sentMessageInput,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(50),
                   topRight: Radius.circular(50),
@@ -124,7 +163,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             conversation.participantName,
                             conversation.participantImage,
                             conversation.lastMessage,
-                           DateFormatter.formatLastMessageTime(conversation.lastMessageTime)
+                            DateFormatter.formatLastMessageTime(
+                              conversation.lastMessageTime,
+                            ),
                           ),
                         );
                       },
@@ -146,7 +187,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             MaterialPageRoute(builder: (context) => ContactsScreen()),
           );
         },
-        backgroundColor: DefaultColors.buttonColor,
+        backgroundColor: AppColors.buttonColor,
         child: Icon(Icons.contacts),
       ),
     );
@@ -159,7 +200,10 @@ Widget _buildRecentContact(String name, String image) {
     child: Column(
       children: [
         CircleAvatar(radius: 30, backgroundImage: NetworkImage(image)),
-        Text(name, style:TextStyle(color: Colors.white, fontWeight: FontWeight.bold) ),
+        Text(
+          name,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ],
     ),
   );

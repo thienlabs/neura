@@ -23,8 +23,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  
-
   void _onRegister() {
     BlocProvider.of<AuthBloc>(context).add(
       RegisterEvent(
@@ -83,11 +81,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 listener: (context, state) {
                   if (state is AuthSuccess) {
                     Navigator.pushReplacementNamed(context, '/login');
-                     showFlushbarStyle(
+                    showFlushbarStyle(
                       context,
                       title: 'Register',
                       message: 'Account created successfully!',
-                      backgroundColor: DefaultColors.buttonColor,
+                      backgroundColor: AppColors.buttonColor,
                       duration: const Duration(seconds: 2),
                     );
                   } else if (state is AuthFailure) {
@@ -97,10 +95,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   }
                 },
               ),
-            
+
               SizedBox(height: 20),
               LoginPrompt(
-                onTap:(){
+                onTap: () {
                   Navigator.pushReplacementNamed(context, '/login');
                 },
                 text: "Don't have an account?",
@@ -117,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return ElevatedButton(
       onPressed: _onRegister,
       style: ElevatedButton.styleFrom(
-        backgroundColor: DefaultColors.buttonColor,
+        backgroundColor: AppColors.buttonColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         padding: EdgeInsets.symmetric(vertical: 15),
       ),
@@ -134,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: DefaultColors.sentMessageInput,
+        color: AppColors.sentMessageInput,
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(

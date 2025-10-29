@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1024405071253",
+    "project_id": "neura-fa252",
+    "storage_bucket": "neura-fa252.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1024405071253:android:54e4a841924b8b810fc29c",
+        "android_client_info": {
+          "package_name": "com.example.neura"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcGyiOTK1r6XzWvU7XlrZDA1Zuh5_eXL8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

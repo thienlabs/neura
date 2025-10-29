@@ -48,7 +48,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             if (state is ContactsLoading) {
               return Center(
                 child: LoadingAnimationWidget.fourRotatingDots(
-                  color: DefaultColors.senderMessage,
+                  color: AppColors.senderMessage,
                   size: 40,
                 ),
               );
@@ -63,9 +63,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   final contact = contacts[index];
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                       contact.image
-                      ),
+                      backgroundImage: NetworkImage(contact.image),
                     ),
                     title: Text(contact.userName),
                     subtitle: Text(contact.email),
@@ -75,7 +73,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         barrierDismissible: false,
                         builder: (_) => Center(
                           child: LoadingAnimationWidget.staggeredDotsWave(
-                            color: DefaultColors.senderMessage,
+                            color: AppColors.senderMessage,
                             size: 60,
                           ),
                         ),
@@ -84,7 +82,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         CheckOrCreateConversationEvent(
                           contactId: contact.id,
                           contactName: contact.userName,
-                          contactImage: contact.image
+                          contactImage: contact.image,
                         ),
                       );
                     },
@@ -103,8 +101,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddContactDialog(context),
         child: const Icon(Icons.person_add),
-        backgroundColor: DefaultColors.buttonColor,
-        
+        backgroundColor: AppColors.buttonColor,
       ),
     );
   }

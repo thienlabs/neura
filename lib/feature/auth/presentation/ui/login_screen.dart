@@ -67,10 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
               BlocConsumer<AuthBloc, AuthState>(
                 builder: (context, state) {
                   if (state is AuthLoading) {
-                    return Center(child:  LoadingAnimationWidget.threeRotatingDots(
-                  color: DefaultColors.senderMessage,
-                  size: 40,
-                ),);
+                    return Center(
+                      child: LoadingAnimationWidget.threeRotatingDots(
+                        color: AppColors.senderMessage,
+                        size: 40,
+                      ),
+                    );
                   }
                   return AuthButton(text: 'Login', onPressed: _onLogin);
                 },
@@ -81,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       context,
                       title: 'Login',
                       message: 'Successfully!',
-                      backgroundColor: DefaultColors.buttonColor,
+                      backgroundColor: AppColors.buttonColor,
                       duration: const Duration(seconds: 2),
                     );
                   } else if (state is AuthFailure) {
@@ -110,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return ElevatedButton(
       onPressed: _onLogin,
       style: ElevatedButton.styleFrom(
-        backgroundColor: DefaultColors.buttonColor,
+        backgroundColor: AppColors.buttonColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         padding: EdgeInsets.symmetric(vertical: 15),
       ),
@@ -127,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: DefaultColors.sentMessageInput,
+        color: AppColors.sentMessageInput,
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(

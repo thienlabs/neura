@@ -18,7 +18,7 @@ class AuthInputField extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: DefaultColors.sentMessageInput,
+        color: AppColors.sentMessageInput,
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
