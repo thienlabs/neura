@@ -16,7 +16,6 @@ class MessageModel extends Message {
       conversationId: json['conversation_id'] ?? '',
       senderId: json['sender_id']?['_id'] ?? '',
       content: json['content'] ?? '',
-     
       createdAt: json['created_at'],
     );
   }

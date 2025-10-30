@@ -35,6 +35,9 @@ class SocketService {
     _socket.onConnectError((data) {
       print('❌ Lỗi kết nối Socket: $data');
     });
+   _socket.onReconnect((_) {
+  print("🔁 Socket reconnected");
+});
 
     _socket.onError((data) {
       print('💥 Lỗi Socket: $data');

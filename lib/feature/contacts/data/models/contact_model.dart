@@ -8,7 +8,7 @@ class ContactModel extends Contact {
       id: json['_id'] ?? '',
       userName: json['name'] ?? '',
       email: json['email'] ?? '',
-      image: json['image'] ?? '',
+      image: json['image'] ?? 'https://www.gravatar.com/avatar/?d=mp',
     );
   }
 }

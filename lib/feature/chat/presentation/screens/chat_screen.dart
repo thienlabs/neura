@@ -59,6 +59,15 @@ class _ChatScreenState extends State<ChatScreen> {
         context,
       ).add(SendMessageEvent(widget.conversationId, content));
       _messageController.clear();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
     }
   }
 
@@ -90,6 +99,16 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   );
                 } else if (state is ChatLoadedState) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_scrollController.hasClients) {
+                      _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                    }
+                  });
+
                   return ListView.builder(
                     padding: EdgeInsets.all(20),
                     itemCount: state.messages.length,
@@ -106,7 +125,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                   );
                 } else if (state is ChatErrorState) {
-                  return Center(child: Text(state.message));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
                 return Center(child: Text('No message fount'));
               },
@@ -128,7 +152,11 @@ class _ChatScreenState extends State<ChatScreen> {
           color: AppColors.receiverMessage,
           borderRadius: BorderRadius.circular(30),
         ),
-        child: Text(message, style: Theme.of(context).textTheme.bodyMedium),
+        child: Column(
+          children: [
+            Text(message, style: Theme.of(context).textTheme.bodyMedium),
+          ],
+        ),
       ),
     );
   }

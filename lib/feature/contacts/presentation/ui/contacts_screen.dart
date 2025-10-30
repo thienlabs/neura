@@ -63,7 +63,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   final contact = contacts[index];
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(contact.image),
+                      backgroundImage: NetworkImage(contact.image,scale: 1.0),
                     ),
                     title: Text(contact.userName),
                     subtitle: Text(contact.email),

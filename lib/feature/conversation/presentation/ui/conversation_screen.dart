@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:neura/core/themes/theme.dart';
 import 'package:neura/core/utils/date_formatter.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_event.dart';
+import 'package:neura/feature/auth/presentation/bloc/auth_state.dart';
 import 'package:neura/feature/chat/presentation/screens/chat_screen.dart';
 import 'package:neura/feature/contacts/presentation/ui/contacts_screen.dart';
 import 'package:neura/feature/conversation/presentation/bloc/conversation_bloc.dart';
@@ -58,7 +62,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 title: Text('PROFILE'),
                 onTap: () {},
               ),
-               ListTile(
+              ListTile(
                 leading: Icon(Icons.notifications),
                 title: Text('NOTIFICATIONS'),
                 onTap: () {},
@@ -68,13 +72,38 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 title: Text('SETTINGS'),
                 onTap: () {},
               ),
-              
+
               Spacer(),
               Divider(),
-              ListTile(
-                leading: Icon(Icons.logout),
-                title: Text('LOGOUT'),
-                onTap: () {},
+              BlocListener<AuthBloc, AuthState>(
+                listener: (context, state) {
+                  
+                   if (state is AuthLoggedOut) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                      (route) => false,
+                    );
+                  }
+                },
+                child: ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: const Text('LOGOUT'),
+                  onTap: ()async {
+                    showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => Center(
+                          child: LoadingAnimationWidget.staggeredDotsWave(
+                            color: AppColors.senderMessage,
+                            size: 60,
+                          ),
+                        ),
+                      );
+                      await Future.delayed(const Duration(seconds: 2));
+                    context.read<AuthBloc>().add(LogoutEvent());
+                  },
+                ),
               ),
             ],
           ),

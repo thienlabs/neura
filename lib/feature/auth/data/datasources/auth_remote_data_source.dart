@@ -34,4 +34,5 @@ class AuthRemoteDataSource {
 
     return UserModel.fromJson(data);
   }
+  
 }

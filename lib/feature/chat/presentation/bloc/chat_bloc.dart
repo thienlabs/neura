@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:neura/core/services/socket_service.dart';
 import 'package:neura/feature/chat/domain/entities/message.dart';
 import 'package:neura/feature/chat/domain/usecases/fetch_message_use_case.dart';
@@ -10,12 +11,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final FetchMessageUseCase fetchMessageUseCase;
   final SocketService _socketService = SocketService();
   final List<Message> _messages = [];
+
   final _storage = const FlutterSecureStorage();
+ 
 
   ChatBloc({required this.fetchMessageUseCase}) : super(ChatLoadingState()) {
     on<LoadMessagesEvent>(_onLoadMessages);
     on<SendMessageEvent>(_onSendMessage);
     on<ReceiveMessageEvent>(_onReceiveMessage);
+    
 
     _socketService.socket.on('receive_message', (data) {
       print('📥 Tin nhắn mới nhận được: $data');
@@ -51,16 +55,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     SendMessageEvent event,
     Emitter<ChatState> emit,
   ) async {
+     
     final userId = await _storage.read(key: 'userId') ?? '';
     if (userId.isEmpty) {
       print('⚠️ Không tìm thấy userId');
       return;
     }
-
+    
     final newMessage = {
       'conversationId': event.conversationId,
       'senderId': userId,
       'content': event.content,
+      
     };
 
     print('📤 Gửi tin nhắn: $newMessage');
