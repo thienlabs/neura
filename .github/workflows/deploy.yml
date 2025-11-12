@@ -24,8 +24,4 @@ jobs:
       run: flutter build web --release
       
     - name: Deploy to Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-args: '--prod --yes' 
-        working-directory: ./
+      run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
