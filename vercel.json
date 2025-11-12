@@ -11,8 +11,13 @@
     {
       "src": "/(.*)",
       "dest": "/build/web/$1"
+    },
+    {
+      "src": "/(.*)",
+      "status": 200,
+      "dest": "/build/web/index.html"
     }
   ],
-  "buildCommand": "flutter build web --release --web-renderer html",
-  "outputDirectory": "build/web"
+  "cleanUrls": true,
+  "trailingSlash": false
 }
