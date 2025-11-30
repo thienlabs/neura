@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neura/core/reposive/constraint_scaffold.dart';
 import 'package:neura/core/themes/theme.dart';
 import 'package:neura/core/utils/show_flushbar.dart';
 import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
@@ -43,7 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ConstraintScaffold(
       appBar: AppBar(),
       body: Center(
         child: Padding(

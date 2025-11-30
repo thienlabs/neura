@@ -3,6 +3,7 @@ import 'package:another_flushbar/flushbar_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:neura/core/reposive/constraint_scaffold.dart';
 import 'package:neura/core/themes/theme.dart';
 import 'package:neura/core/utils/show_flushbar.dart';
 import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
@@ -41,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ConstraintScaffold(
       appBar: AppBar(),
       body: Center(
         child: Padding(

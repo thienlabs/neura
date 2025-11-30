@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:neura/core/reposive/constraint_scaffold.dart';
 import 'package:neura/core/themes/theme.dart';
 import 'package:neura/feature/chat/presentation/bloc/chat_bloc.dart';
 import 'package:neura/feature/chat/presentation/bloc/chat_event.dart';
@@ -73,7 +74,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ConstraintScaffold(
       appBar: AppBar(
         centerTitle: false,
         backgroundColor: Colors.transparent,

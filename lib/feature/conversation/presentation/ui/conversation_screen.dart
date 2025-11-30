@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:neura/core/reposive/constraint_scaffold.dart';
 import 'package:neura/core/themes/theme.dart';
 import 'package:neura/core/utils/date_formatter.dart';
 import 'package:neura/feature/auth/presentation/bloc/auth_bloc.dart';
@@ -29,7 +30,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ConstraintScaffold(
       appBar: AppBar(
         title: Text('Messages', style: Theme.of(context).textTheme.titleLarge),
         leading: Builder(
